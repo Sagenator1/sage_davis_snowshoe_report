@@ -1,10 +1,60 @@
 ---
-title: "Assignment 4"
-author: "Sage Davis"
+title: "TASK 2: Mini “exploratory report” on juvenile snowshoe hares in Bonanza Creek Experimental Forest "
+author: "Author: Sage Davis"
 date: "11/7/2021"
 output: html_document
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+
+```{r setup, include = FALSE, , message = FALSE, warning = FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+ 
+library(tidyverse)
+library(janitor)
+library(here)
+library(lubridate)
+library(kableExtra)
+
 ```
+
+```{r}
+# Read in hare bonanza data
+
+hares <- read_csv(here("data", "bonanza_hares.csv"))
+
+hares
+```
+
+
+```{r}
+
+# Convert date to to format
+
+hares_date <- hares %>%        
+  mutate(date = mdy(date)) %>%   # convert date char. to date format
+  mutate(year = year(date))  # add new column for year
+
+# Count annual hare traps.
+  
+hares_an_count <- hares_date %>% # Use date datasets
+  group_by(year) %>% 
+  summarize(sample_size = n())
+
+hares_an_count
+
+ggplot(data = hares_an_count, aes(x = year, y = sample_size)) +
+  geom_col() + 
+  theme_minimal() +
+  labs(x = "Year", y = "Annual Juvenile Hare Trappings", 
+       caption = "Figure 1: Annual Juvenile Hare Trappings by Year")
+
+
+  
+```
+```{r}
+
+ggplot(data = hares_date, aes(x=year)) +
+  geom_histogram() +
+  theme_minimal()
+```
+
