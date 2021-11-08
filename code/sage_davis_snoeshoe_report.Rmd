@@ -14,6 +14,7 @@ library(janitor)
 library(here)
 library(lubridate)
 library(kableExtra)
+library(effsize)
 
 ```
 
@@ -27,30 +28,37 @@ hares
 
 
 ```{r}
+# 3) c) i)
 
-# Convert date to to format
+# Convert date to date format
 
 hares_date <- hares %>%        
-  mutate(date = mdy(date)) %>%   # convert date char. to date format
-  mutate(year = year(date))  # add new column for year
+  mutate(date = mdy(date)) %>%    # convert date char. to date format
+  mutate(day = day(date)) %>%     # add new column for day
+  mutate(year = year(date))       # add new column for year
 
 # Count annual hare traps.
   
-hares_an_count <- hares_date %>% # Use date datasets
+hares_juv <- hares_date %>%    # Start with hares_date dataset
+  filter(age == "j")     # Filter for juveniles
+  
+hares_juv_count <- hares_juv %>% 
   group_by(year) %>% 
-  summarize(sample_size = n())
+  summarize(juv_count = n())    # Summarize by year
 
-hares_an_count
-
-ggplot(data = hares_an_count, aes(x = year, y = sample_size)) +
+ggplot(data = hares_juv_count, aes(x = year, y = juv_count)) +
   geom_col() + 
   theme_minimal() +
-  labs(x = "Year", y = "Annual Juvenile Hare Trappings", 
-       caption = "Figure 1: Annual Juvenile Hare Trappings by Year")
+  labs(x = "Year", y = "Annual Juvenile Hare Trappings")
 
 
   
 ```
+
+**Figure 1.**  Annual juvenile hare observations during 1998 - 2012 at Bonanza Creek LTER, Alaska.  Kielland, et al. (2017)  
+
+
+Check - not good
 ```{r}
 
 ggplot(data = hares_date, aes(x=year)) +
@@ -58,3 +66,81 @@ ggplot(data = hares_date, aes(x=year)) +
   theme_minimal()
 ```
 
+```{r}
+# 3) c) ii)
+
+ggplot(data = hares_juv, aes(x = sex, y = weight, color = grid)) +   # Plot points sex vs. weight
+  geom_point() +
+  facet_wrap(~grid) +                                               # split plots by sampling site
+  labs(x = "Sex", y = "Weight (g)", 
+       title = "Juvenile Hare Weights vs Sex for Three Sampling Sites", 
+       legend.title = "Sampling Site") +
+  scale_color_discrete(name = "Sampling Site")                        # rename legend
+
+
+```
+
+
+```{r}
+
+# 3) c) iii)
+
+hares_juv_sex <- hares_juv %>%   # Start with hares_juv dataset
+  filter(!is.na(sex))           # Remove sex with NA in cell
+
+hares_juv_weights <- hares_juv_sex %>%   # Start with hares_juv_sex dataset
+  group_by(sex) %>% 
+  summarize(wt_mean = round(mean(weight, na.rm = TRUE), 1),  # Create table by sex for various weight stats
+           wt_sd = round(sd(weight, na.rm = TRUE), 1),      # Round data 
+           sample_size = n())
+# Exploratory Code and Plots
+
+ggplot(data = hares_juv_sex, aes(x = weight, color = sex)) +   # Plot points sex vs. weight
+  geom_histogram() +
+  facet_wrap(~grid)
+
+ggplot(data = hares_juv_sex, aes(sample = weight)) +
+  geom_qq() +
+  facet_wrap(~grid)
+
+# Previous Plot - Histogram does not really look normally distributed but QQ-plot looks ok
+
+ggplot(data = hares_juv_sex, aes(x = weight, color = grid)) +   # Plot points sex vs. weight
+  geom_histogram() +
+  facet_wrap(~sex)
+
+ggplot(data = hares_juv_sex, aes(sample = weight)) +
+  geom_qq() +
+  facet_wrap(~sex)
+
+# Previous plot - Female looks more normally distributed
+
+hares_juv_f <- hares_juv_sex %>% 
+  filter(sex == "f") %>% 
+  select(weight)
+
+hares_juv_m <- hares_juv_sex %>% 
+  filter(sex == "m") %>% 
+  select(weight)
+
+hares_juv_sex %>% 
+  cohen.d(weight, sex)  ##not working
+
+#How do you for split up columns or from different datasets?
+t.test()
+```
+
+
+```{r}
+ # 3) c) iii) Table
+
+hares_juv_weights_table <- hares_juv_weights %>%                   # Finalize Table
+  kable(col.names = c("Hare Sex",
+                      "Mean Weight (g)", 
+                      "Standard Deviation (g)",
+                      "Sample size (n)"), 
+        caption = "Female & Male Juvenile Hare Weight Means and Standard Deviations") %>% 
+  kable_styling(full_width = FALSE)
+
+```
+  Statement here:
