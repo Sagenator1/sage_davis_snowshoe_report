@@ -123,11 +123,16 @@ hares_juv_m <- hares_juv_sex %>%
   filter(sex == "m") %>% 
   select(weight)
 
-hares_juv_sex %>% 
-  cohen.d(weight, sex)  ##not working
+cohen.d(hares_juv_f, hares_juv_m, na.rm = TRUE)  ##not working - 1st paramter not numeric - do I need to remove na
 
 #How do you for split up columns or from different datasets?
-t.test()
+
+hares_juv_wt_sex_t <- t.test(hares_juv_m, hares_juv_f)
+
+round(hares_juv_wt_sex_t$estimate, 2)
+
+hares_juv_f
+
 ```
 
 
@@ -143,4 +148,13 @@ hares_juv_weights_table <- hares_juv_weights %>%                   # Finalize Ta
   kable_styling(full_width = FALSE)
 
 ```
+  
   Statement here:
+  
+```{r}
+
+# 3) c) iv)
+
+
+```
+  
