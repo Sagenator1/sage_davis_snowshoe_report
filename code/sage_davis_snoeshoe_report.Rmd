@@ -15,6 +15,7 @@ library(here)
 library(lubridate)
 library(kableExtra)
 library(effsize)
+library(ggbeeswarm)
 
 ```
 
@@ -30,24 +31,28 @@ hares
 ```{r}
 # 3) c) i)
 
-# Convert date to date format
+# Convert date to date format, add column for day and year
 
 hares_date <- hares %>%        
-  mutate(date = mdy(date)) %>%    # convert date char. to date format
-  mutate(day = day(date)) %>%     # add new column for day
-  mutate(year = year(date))       # add new column for year
+  mutate(date = mdy(date)) %>%    
+  mutate(day = day(date)) %>%     
+  mutate(year = year(date))       
 
-# Count annual hare traps.
+# Count annual hare traps, filter for juveniles
   
-hares_juv <- hares_date %>%    # Start with hares_date dataset
-  filter(age == "j")     # Filter for juveniles
-  
+hares_juv <- hares_date %>%    
+  filter(age == "j")        
+
+# Create Table Summarize by year
+
 hares_juv_count <- hares_juv %>% 
   group_by(year) %>% 
-  summarize(juv_count = n())    # Summarize by year
+  summarize(juv_count = n())    
+
+# Create finalized data visualization
 
 ggplot(data = hares_juv_count, aes(x = year, y = juv_count)) +
-  geom_col() + 
+  geom_col(fill = "yellow", color = "blue") + 
   theme_minimal() +
   labs(x = "Year", y = "Annual Juvenile Hare Trappings")
 
@@ -58,27 +63,24 @@ ggplot(data = hares_juv_count, aes(x = year, y = juv_count)) +
 **Figure 1.**  Annual juvenile hare observations during 1998 - 2012 at Bonanza Creek LTER, Alaska.  Kielland, et al. (2017)  
 
 
-Check - not good
-```{r}
 
-ggplot(data = hares_date, aes(x=year)) +
-  geom_histogram() +
-  theme_minimal()
-```
 
 ```{r}
 # 3) c) ii)
 
 ggplot(data = hares_juv, aes(x = sex, y = weight, color = grid)) +   # Plot points sex vs. weight
-  geom_point() +
+  geom_beeswarm() +
+  theme_minimal() +
   facet_wrap(~grid) +                                               # split plots by sampling site
   labs(x = "Sex", y = "Weight (g)", 
        title = "Juvenile Hare Weights vs Sex for Three Sampling Sites", 
        legend.title = "Sampling Site") +
-  scale_color_discrete(name = "Sampling Site")                        # rename legend
+  scale_color_discrete(name = "Sampling Site")
+                      #labels = c("bonanza1", "bonanza2", "bonanza3"))                        # rename legend
 
 
 ```
+Description:
 
 
 ```{r}
@@ -123,13 +125,15 @@ hares_juv_m <- hares_juv_sex %>%
   filter(sex == "m") %>% 
   select(weight)
 
-cohen.d(hares_juv_f, hares_juv_m, na.rm = TRUE)  ##not working - 1st paramter not numeric - do I need to remove na
-
-#How do you for split up columns or from different datasets?
-
 hares_juv_wt_sex_t <- t.test(hares_juv_m, hares_juv_f)
 
 round(hares_juv_wt_sex_t$estimate, 2)
+
+
+# weight_cohen <- cohen.d(hares_juv_m, hares_juv_f, na.rm = TRUE)  ##not working - 1st paramter not numeric - do I need to remove na
+
+# How do you for split up columns or from different datasets?
+
 
 hares_juv_f
 
@@ -153,8 +157,29 @@ hares_juv_weights_table <- hares_juv_weights %>%                   # Finalize Ta
   
 ```{r}
 
-# 3) c) iv)
+# 3) c) iv) - Relationship between Juvenile weight & hind foot length (mm)
+
+# hares_juv_wt_hr <- hares_juv  %>%  # start with hares_juv data
+ggplot(data = hares_juv, aes(x = hindft, y = weight, color = sex)) +
+  geom_point() +
+  theme_minimal() +
+  labs(x = "Hindfoot Length (mm)", y = "Hare Weight (g)") +
+  scale_color_discrete(name = "Sex",                       # formulas say _fill_?
+                      labels = c("Female", "Male", "Undetermined"))     
+
+
 
 
 ```
   
+```{r}
+# Boss asks for linear regression of Weight vs Hindfoot Length
+
+hares_juv_lm <- lm(weight ~ hindft, data = hares_juv)
+
+summary(hares_juv_lm)
+
+
+```
+
+The linear regression showed that on average the weight of the hare will increase by `r round(hares_juv_lm$coefficient[2], 2)` grams per mm of hindfoot increase.
