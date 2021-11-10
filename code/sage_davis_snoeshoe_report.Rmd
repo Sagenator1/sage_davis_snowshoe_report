@@ -41,7 +41,7 @@ Hare data including sampling site,, date caught, sex, age (adult or juvenile), l
 
 ### A. Annual juvenile hare counts
 
-```{r basic_flipper_plot, fig.align = "center"}
+```{r echo = FALSE, message = FALSE, warning = FALSE, fig.keep = "last", fig.align = "center"}
 
 # 3) c) i) i)	Annual juvenile hare trap counts. Count the total number of juvenile hare trappings during each year of the study, and create a finalized data visualization of the counts by year. Include a figure caption below the figure in your report. 
 
@@ -94,7 +94,7 @@ ggplot(data = hares_juv_count, aes(x = year, y = juv_count)) +
 ## B. Juvenile hare weights for each sex at each sampling site
 
 
-```{r}
+```{r echo = FALSE, message = FALSE, warning = FALSE, fig.keep = "last", fig.align = "center"}
 
 # 3) c) ii) ii)	Visualize juvenile hare weights. Create a finalized data visualization (or visualizations) in which you compare **juvenile hare weights by sex and site (grid)** (ignore other variables). You should include groups where these variables are not recorded (`NA`). Include finalized figure captions below your visualization(s).
 
@@ -120,7 +120,7 @@ ggplot(data = hares_juv_sex_case, aes(x = sex, y = weight, color = grid)) +   # 
 
 ## C. Female and male juvenile hare weight comparison
 
-```{r}
+```{r echo = FALSE, message = FALSE, warning = FALSE, fig.keep = 'none', results = FALSE}
 
 # 3) c) iii)  iii)	Juvenile weight comparison (male & female snowshoe hares). Further compare mean weights for **juvenile male and female snowshoe hares** included in this study. In this section, you should include:
 
@@ -137,7 +137,9 @@ hares_juv_weights <- hares_juv_sex %>%   # Start with hares_juv_sex dataset
            sample_size = n())
 # Exploratory Code and Plots
 
-ggplot(data = hares_juv_sex, aes(x = weight, color = sex)) +   # Plot points sex vs. weight
+# Plot points sex vs. weight
+
+ggplot(data = hares_juv_sex, aes(x = weight, color = sex)) +   
   geom_histogram() +
   facet_wrap(~grid)
 
@@ -147,7 +149,9 @@ ggplot(data = hares_juv_sex, aes(sample = weight)) +
 
 # Previous Plot - Histogram does not really look normally distributed but QQ-plot looks ok
 
-ggplot(data = hares_juv_sex, aes(x = weight, color = grid)) +   # Plot points sex vs. weight
+# Plot points sex vs. weight
+
+ggplot(data = hares_juv_sex, aes(x = weight, color = grid)) +   
   geom_histogram(binwidth = 20) +
   facet_wrap(~sex)
 
@@ -158,7 +162,7 @@ ggplot(data = hares_juv_sex, aes(sample = weight)) +
 # Previous plot - Female looks more normally distributed
 
 cohen <- cohen.d(weight ~ sex, hares_juv_sex, na.rm = TRUE)
-cohen
+# cohen
 
 
 
@@ -174,19 +178,18 @@ hares_juv_wt_sex_t <- t.test(hares_juv_m, hares_juv_f)
 
 round(hares_juv_wt_sex_t$estimate, 2)
 
-weight_cohen <- cohen.d(hares_juv_m$weight, hares_juv_f$weight, na.rm = TRUE)
-
-#weight_cohen <- cohen.d(hares_juv_m, hares_juv_f, na.rm = TRUE)  ##not working - 1st paramter not numeric - do I need to remove na
+cohen.d(hares_juv_m$weight, hares_juv_f$weight, na.rm = TRUE)
 
 # How do you for split up columns or from different datasets?
 
-summary(weight_cohen)
+# summary(weight_cohen)
 
 ```
 
 
 
-```{r}
+```{r echo = FALSE, message = FALSE, warning = FALSE}
+
  # 3) c) iii) Table
 
 hares_juv_weights_table <- hares_juv_weights %>%                   # Finalize Table
@@ -205,7 +208,7 @@ The distributions of the female and male hares is relaively but the female distr
    
 ## D. Relationship between Juvenile weight & hind foot length
   
-```{r}
+```{r echo = FALSE, message = FALSE, warning = FALSE, fig.keep = 'all'}
 
 # 3) c) iv) Relationship between juvenile weight & hind foot length. Explore the relationship between juvenile snowshoe hare hind foot length (variable `hindft`, recorded in millimeters), and weight. Include all juvenile hares in the study. Create a final visualization of juvenile hare hind foot length versus weight. Include a figure caption.
 
@@ -225,7 +228,8 @@ ggplot(data = hares_juv, aes(x = hindft, y = weight, color = sex)) +
 **Figure 3.**  
 
 
-```{r}
+```{r echo = FALSE, message = FALSE, warning = FALSE, fig.keep = 'none', results = FALSE}
+
 # Boss asks for linear regression of Weight vs Hindfoot Length
 
 hares_juv_lm <- lm(weight ~ hindft, data = hares_juv)
