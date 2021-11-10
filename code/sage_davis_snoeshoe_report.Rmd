@@ -1,5 +1,5 @@
 ---
-title: "TASK 2: Mini “exploratory report” on juvenile snowshoe hares in Bonanza Creek Experimental Forest "
+title: "Juvenile snowshoe hares in Bonanza Creek Experimental Forest: exploritory report "
 author: "Author: Sage Davis"
 date: "11/7/2021"
 output: html_document
@@ -19,7 +19,7 @@ library(ggbeeswarm)
 
 ```
 
-```{r}
+```{r include = FALSE, message = FALSE, warning = FALSE}
 # Read in hare bonanza data
 
 hares <- read_csv(here("data", "bonanza_hares.csv"))
@@ -27,8 +27,17 @@ hares <- read_csv(here("data", "bonanza_hares.csv"))
 hares
 ```
 
+### 1. Introduction
 
-```{r}
+This report provides an exploratory overview if differences in juvenile hares for three Bonnaza Creek Experimental Forest (Long Term Research Forest) sampling sites (bonbs, bonmat, and bonrip) in Alaska during the interval between 1998 1 2012 (Kielland et al. 2017). These sites were used for live trappings of snoeshoe hares to monitor their abundance and survival in the experimental forest.  Specifically the number of juvenile hares trapped each year, the hare weights compared  by sex and sampling location, the compared weigts between each sex, and the relationship between weight and hind foot length.
+
+### 2. Data & Analysis
+
+Hare data including sampling site,, date caught, sex, age (adult or juvenile), left ear, right ear, hind footlength, and weight was collected and provided by Dr. Knut Kielland and colleague at the Bonanza Creek Experimental Forest in Alaska.  The data contained 3197 unique observations of hares, and of those those there were 378 juvenile hare abservations, collected over 14 years.  Following exploritory data analysis and visualizations, the juvenile weight comparisons between male and female are compared using a two-sample t-test.  They are further compared using a Cohen's d effect size.  The relationship between the juvenile weight and hind foot length is explored using a linear regression.  All analyses are in R version 4.1.1 using RStudio version 2021.09.0.
+
+(Users\brenguest\Documents\MESM\esm206\Assignments\Assignment 4\sage_davis_snowshoe_report\bonbs.PNG)
+
+```{r basic_flipper_plot, fig.align = "center"}
 # 3) c) i)
 
 # Convert date to date format, add column for day and year
@@ -47,9 +56,20 @@ hares_juv <- hares_date %>%
 
 hares_juv_count <- hares_juv %>% 
   group_by(year) %>% 
-  summarize(juv_count = n())    
+  summarize(juv_count = n())  
+            
+# pull max, min, median, mean from hares_juv_counts
 
-# Create finalized data visualization
+hares_min <- min(hares_juv_count$juv_count, na.rm = TRUE)
+
+hares_max <- max(hares_juv_count$juv_count, na.re = TRUE)
+
+hares_mean <- mean(hares_juv_count$juv_count, na.rm = TRUE)
+
+hares_med <- median(hares_juv_count$juv_count, na.rm = TRUE)
+
+
+# Create finalized data visualization for year vs. count
 
 ggplot(data = hares_juv_count, aes(x = year, y = juv_count)) +
   geom_col(fill = "yellow", color = "blue") + 
@@ -58,12 +78,13 @@ ggplot(data = hares_juv_count, aes(x = year, y = juv_count)) +
 
 ggplot(data = hares_juv_count, aes(x = year, y = juv_count)) +
   geom_line(fill = "yellow", color = "blue") + 
+  geom_point(shape = 21, color = "black", fill = "red", size = 3) +
   theme_minimal() +
-  labs(x = "Year", y = "Annual Juvenile Hare Trappings")
+  labs(x = "Year", y = "Annual Juvenile Hare Trappings") 
   
 ```
 
-**Figure 1.**  Annual juvenile hare observations during 1998 - 2012 at Bonanza Creek LTER, Alaska.  Kielland, et al. (2017)  
+**Figure 1.**  Annual juvenile hare observations during 1998 - 2012 at Bonanza Creek LTER, Alaska.  Kielland, et al. (2017).  The juvenile hare observation stats were `r hares_max` max., `r hares_min` min., `r hares_med` median, and `r hares_mean` mean.
 
 
 
@@ -75,21 +96,23 @@ ggplot(data = hares_juv, aes(x = sex, y = weight, color = grid)) +   # Plot poin
   geom_beeswarm() +
   theme_minimal() +
   facet_wrap(~grid) +                                               # split plots by sampling site
+  theme(strip.text.x = element_blank()) +
   labs(x = "Sex", y = "Weight (g)", 
        title = "Juvenile Hare Weights vs Sex for Three Sampling Sites", 
        legend.title = "Sampling Site") +
-  scale_color_discrete(name = "Sampling Site")
-                      #labels = c("bonanza1", "bonanza2", "bonanza3"))                        # rename legend
+  scale_color_discrete(name = "Sampling Site",
+                       labels = c("Bonanza BS", "Bonanza Mature", "Bonanza Riparian"))  # rename legend
 
 ggplot(data = hares_juv, aes(x = sex, y = weight, color = grid)) +   # Plot points sex vs. weight
   geom_line() +
   theme_minimal() +
-  facet_wrap(~grid) +                                               # split plots by sampling site
+  facet_wrap(~grid) + # split plots by sampling site
+  theme(strip.text.x = element_blank()) +
   labs(x = "Sex", y = "Weight (g)", 
        title = "Juvenile Hare Weights vs Sex for Three Sampling Sites", 
        legend.title = "Sampling Site") +
-  scale_color_discrete(name = "Sampling Site")
-                      #labels = c("bonanza1", "bonanza2", "bonanza3"))                        # rename legend
+  scale_color_discrete(name = "Sampling Site", 
+                      labels = c("Bonanza BS", "Bonanza Mature", "Bonanza Riparian"))    # rename legend
 
 
 ```
