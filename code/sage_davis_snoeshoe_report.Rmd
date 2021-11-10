@@ -6,8 +6,8 @@ output: html_document
 ---
 
 
-```{r setup, include = FALSE, , message = FALSE, warning = FALSE}
-knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+```{r setup, include = FALSE, message = FALSE, warning = FALSE}
+knitr::opts_chunk$set(echo = TRUE,message = FALSE, warning = FALSE)
  
 library(tidyverse)
 library(janitor)
@@ -56,7 +56,10 @@ ggplot(data = hares_juv_count, aes(x = year, y = juv_count)) +
   theme_minimal() +
   labs(x = "Year", y = "Annual Juvenile Hare Trappings")
 
-
+ggplot(data = hares_juv_count, aes(x = year, y = juv_count)) +
+  geom_line(fill = "yellow", color = "blue") + 
+  theme_minimal() +
+  labs(x = "Year", y = "Annual Juvenile Hare Trappings")
   
 ```
 
@@ -70,6 +73,16 @@ ggplot(data = hares_juv_count, aes(x = year, y = juv_count)) +
 
 ggplot(data = hares_juv, aes(x = sex, y = weight, color = grid)) +   # Plot points sex vs. weight
   geom_beeswarm() +
+  theme_minimal() +
+  facet_wrap(~grid) +                                               # split plots by sampling site
+  labs(x = "Sex", y = "Weight (g)", 
+       title = "Juvenile Hare Weights vs Sex for Three Sampling Sites", 
+       legend.title = "Sampling Site") +
+  scale_color_discrete(name = "Sampling Site")
+                      #labels = c("bonanza1", "bonanza2", "bonanza3"))                        # rename legend
+
+ggplot(data = hares_juv, aes(x = sex, y = weight, color = grid)) +   # Plot points sex vs. weight
+  geom_line() +
   theme_minimal() +
   facet_wrap(~grid) +                                               # split plots by sampling site
   labs(x = "Sex", y = "Weight (g)", 
@@ -108,7 +121,7 @@ ggplot(data = hares_juv_sex, aes(sample = weight)) +
 # Previous Plot - Histogram does not really look normally distributed but QQ-plot looks ok
 
 ggplot(data = hares_juv_sex, aes(x = weight, color = grid)) +   # Plot points sex vs. weight
-  geom_histogram() +
+  geom_histogram(binwidth = 20) +
   facet_wrap(~sex)
 
 ggplot(data = hares_juv_sex, aes(sample = weight)) +
@@ -116,6 +129,11 @@ ggplot(data = hares_juv_sex, aes(sample = weight)) +
   facet_wrap(~sex)
 
 # Previous plot - Female looks more normally distributed
+
+cohen <- cohen.d(weight ~ sex, hares_juv_sex, na.rm = TRUE)
+cohen
+
+
 
 hares_juv_f <- hares_juv_sex %>% 
   filter(sex == "f") %>% 
@@ -129,15 +147,16 @@ hares_juv_wt_sex_t <- t.test(hares_juv_m, hares_juv_f)
 
 round(hares_juv_wt_sex_t$estimate, 2)
 
+weight_cohen <- cohen.d(hares_juv_m$weight, hares_juv_f$weight, na.rm = TRUE)
 
-# weight_cohen <- cohen.d(hares_juv_m, hares_juv_f, na.rm = TRUE)  ##not working - 1st paramter not numeric - do I need to remove na
+#weight_cohen <- cohen.d(hares_juv_m, hares_juv_f, na.rm = TRUE)  ##not working - 1st paramter not numeric - do I need to remove na
 
 # How do you for split up columns or from different datasets?
 
-
-hares_juv_f
+summary(weight_cohen)
 
 ```
+
 
 
 ```{r}
@@ -147,9 +166,11 @@ hares_juv_weights_table <- hares_juv_weights %>%                   # Finalize Ta
   kable(col.names = c("Hare Sex",
                       "Mean Weight (g)", 
                       "Standard Deviation (g)",
-                      "Sample size (n)"), 
+                      "Sample Size (n)"), 
         caption = "Female & Male Juvenile Hare Weight Means and Standard Deviations") %>% 
   kable_styling(full_width = FALSE)
+
+hares_juv_weights_table
 
 ```
   
@@ -162,13 +183,12 @@ hares_juv_weights_table <- hares_juv_weights %>%                   # Finalize Ta
 # hares_juv_wt_hr <- hares_juv  %>%  # start with hares_juv data
 ggplot(data = hares_juv, aes(x = hindft, y = weight, color = sex)) +
   geom_point() +
+  #geom_smooth(method = "lm",color = "red", size = 0.5, fill = "gray10", alpha = 0.5) +
+  #stat_regline_equation(label.x = 180, label.y = 5700) +
   theme_minimal() +
   labs(x = "Hindfoot Length (mm)", y = "Hare Weight (g)") +
   scale_color_discrete(name = "Sex",                       # formulas say _fill_?
                       labels = c("Female", "Male", "Undetermined"))     
-
-
-
 
 ```
   
@@ -179,6 +199,7 @@ hares_juv_lm <- lm(weight ~ hindft, data = hares_juv)
 
 summary(hares_juv_lm)
 
+plot(hares_juv_lm)
 
 ```
 
