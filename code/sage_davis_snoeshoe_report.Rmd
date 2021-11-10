@@ -1,5 +1,5 @@
 ---
-title: "TASK 2: Mini “exploratory report” on juvenile snowshoe hares in Bonanza Creek Experimental Forest "
+title: "Juvenile snowshoe hares in Bonanza Creek Experimental Forest: exploritory report "
 author: "Author: Sage Davis"
 date: "11/7/2021"
 output: html_document
@@ -19,7 +19,7 @@ library(ggbeeswarm)
 
 ```
 
-```{r}
+```{r include = FALSE, message = FALSE, warning = FALSE}
 # Read in hare bonanza data
 
 hares <- read_csv(here("data", "bonanza_hares.csv"))
@@ -27,9 +27,23 @@ hares <- read_csv(here("data", "bonanza_hares.csv"))
 hares
 ```
 
+### 1. Introduction
 
-```{r}
-# 3) c) i)
+This report provides an exploratory overview if differences in juvenile hares for three Bonnaza Creek Experimental Forest (Long Term Research Forest) sampling sites (bonbs, bonmat, and bonrip) in Alaska during the interval between 1998 1 2012 (Kielland et al. 2017). These sites were used for live trappings of snoeshoe hares to monitor their abundance and survival in the experimental forest.  Specifically the number of juvenile hares trapped each year, the hare weights compared  by sex and sampling location, the compared weigts between each sex, and the relationship between weight and hind foot length.
+
+### 2. Data & Analysis
+
+Hare data including sampling site,, date caught, sex, age (adult or juvenile), left ear, right ear, hind footlength, and weight was collected and provided by Dr. Knut Kielland and colleague at the Bonanza Creek Experimental Forest in Alaska.  The data contained 3197 unique observations of hares, and of those those there were 378 juvenile hare abservations, collected over 14 years.  Following exploritory data analysis and visualizations, the juvenile weight comparisons between male and female are compared using a two-sample t-test.  They are further compared using a Cohen's d effect size.  The relationship between the juvenile weight and hind foot length is explored using a linear regression.  All analyses are in R version 4.1.1 using RStudio version 2021.09.0.
+
+(Users\brenguest\Documents\MESM\esm206\Assignments\Assignment 4\sage_davis_snowshoe_report\bonbs.PNG)
+
+## Prelimary Results
+
+### A. Annual juvenile hare counts
+
+```{r basic_flipper_plot, fig.align = "center"}
+
+# 3) c) i) i)	Annual juvenile hare trap counts. Count the total number of juvenile hare trappings during each year of the study, and create a finalized data visualization of the counts by year. Include a figure caption below the figure in your report. 
 
 # Convert date to date format, add column for day and year
 
@@ -47,9 +61,20 @@ hares_juv <- hares_date %>%
 
 hares_juv_count <- hares_juv %>% 
   group_by(year) %>% 
-  summarize(juv_count = n())    
+  summarize(juv_count = n())  
+            
+# pull max, min, median, mean from hares_juv_counts
 
-# Create finalized data visualization
+hares_min <- min(hares_juv_count$juv_count, na.rm = TRUE)
+
+hares_max <- max(hares_juv_count$juv_count, na.re = TRUE)
+
+hares_mean <- mean(hares_juv_count$juv_count, na.rm = TRUE)
+
+hares_med <- median(hares_juv_count$juv_count, na.rm = TRUE)
+
+
+# Create finalized data visualization for year vs. count
 
 ggplot(data = hares_juv_count, aes(x = year, y = juv_count)) +
   geom_col(fill = "yellow", color = "blue") + 
@@ -58,49 +83,51 @@ ggplot(data = hares_juv_count, aes(x = year, y = juv_count)) +
 
 ggplot(data = hares_juv_count, aes(x = year, y = juv_count)) +
   geom_line(fill = "yellow", color = "blue") + 
+  geom_point(shape = 21, color = "black", fill = "red", size = 3) +
   theme_minimal() +
-  labs(x = "Year", y = "Annual Juvenile Hare Trappings")
+  labs(x = "Year", y = "Annual Juvenile Hare Trappings") 
   
 ```
 
-**Figure 1.**  Annual juvenile hare observations during 1998 - 2012 at Bonanza Creek LTER, Alaska.  Kielland, et al. (2017)  
+**Figure 1.**  Annual juvenile hare observations during 1998 - 2012 at Bonanza Creek LTER, Alaska.  Kielland, et al. (2017).  The juvenile hare observation (trapped) stats were `r hares_max` max., `r hares_min` min., `r hares_med` median, and `r hares_mean` mean.  The overall observations are trending down for the dataset but this could be due to some other factor like trap failure or location.  It appears that the trappings are cycling every two to three years from about 50 to under 10 catches annually.  This could possibly be due to the weather or time of year that thre traps are deployed. 
 
-
+## B. Juvenile hare weights for each sex at each sampling site
 
 
 ```{r}
-# 3) c) ii)
 
-ggplot(data = hares_juv, aes(x = sex, y = weight, color = grid)) +   # Plot points sex vs. weight
+# 3) c) ii) ii)	Visualize juvenile hare weights. Create a finalized data visualization (or visualizations) in which you compare **juvenile hare weights by sex and site (grid)** (ignore other variables). You should include groups where these variables are not recorded (`NA`). Include finalized figure captions below your visualization(s).
+
+hares_juv_sex_case <- hares_juv %>%   # Change sex labels
+  mutate(sex = case_when(
+    sex == "f" ~ "Female",
+    sex == "m" ~ "Male"))
+  
+
+ggplot(data = hares_juv_sex_case, aes(x = sex, y = weight, color = grid)) +   # Plot points sex vs. weight
   geom_beeswarm() +
   theme_minimal() +
   facet_wrap(~grid) +                                               # split plots by sampling site
+  theme(strip.text.x = element_blank()) +
   labs(x = "Sex", y = "Weight (g)", 
-       title = "Juvenile Hare Weights vs Sex for Three Sampling Sites", 
        legend.title = "Sampling Site") +
-  scale_color_discrete(name = "Sampling Site")
-                      #labels = c("bonanza1", "bonanza2", "bonanza3"))                        # rename legend
-
-ggplot(data = hares_juv, aes(x = sex, y = weight, color = grid)) +   # Plot points sex vs. weight
-  geom_line() +
-  theme_minimal() +
-  facet_wrap(~grid) +                                               # split plots by sampling site
-  labs(x = "Sex", y = "Weight (g)", 
-       title = "Juvenile Hare Weights vs Sex for Three Sampling Sites", 
-       legend.title = "Sampling Site") +
-  scale_color_discrete(name = "Sampling Site")
-                      #labels = c("bonanza1", "bonanza2", "bonanza3"))                        # rename legend
-
+  scale_color_discrete(name = "Sampling Site",
+                       labels = c("Bonanza BS", "Bonanza Mature", "Bonanza Riparian"))  # rename legend
 
 ```
-Description:
 
+**Figure 2.**  Plots of the juvenile hare weights (grams) for the Female, Male , and Unidentifiable sex juvenile hares at the three sampling sites during 1998 - 2012 at Bonanza Creek LTER, Alaska.  Kielland, et al. (2017).  The Bonanza Riparian site appears to have the largest number of trappings while the Bonanza BS appears to have the smallest.  Overall, the range of weights is between 400 to 1400 grams.  Both the sexes appear to be in the same relative weight range at all three sites.
+
+## C. Female and male juvenile hare weight comparison
 
 ```{r}
 
-# 3) c) iii)
+# 3) c) iii)  iii)	Juvenile weight comparison (male & female snowshoe hares). Further compare mean weights for **juvenile male and female snowshoe hares** included in this study. In this section, you should include:
 
-hares_juv_sex <- hares_juv %>%   # Start with hares_juv dataset
+# ●	A finalized table containing the mean, standard deviation, and sample size for male and female juvenile snowshoe hares, with a table caption (remember, a table caption should be placed *above* the table in your report)
+
+
+hares_juv_sex <- hares_juv_sex_case %>%   # Start with hares_juvsex_case dataset
   filter(!is.na(sex))           # Remove sex with NA in cell
 
 hares_juv_weights <- hares_juv_sex %>%   # Start with hares_juv_sex dataset
@@ -136,11 +163,11 @@ cohen
 
 
 hares_juv_f <- hares_juv_sex %>% 
-  filter(sex == "f") %>% 
+  filter(sex == "Female") %>% 
   select(weight)
 
 hares_juv_m <- hares_juv_sex %>% 
-  filter(sex == "m") %>% 
+  filter(sex == "Male") %>% 
   select(weight)
 
 hares_juv_wt_sex_t <- t.test(hares_juv_m, hares_juv_f)
@@ -174,24 +201,30 @@ hares_juv_weights_table
 
 ```
   
-  Statement here:
+The distributions of the female and male hares is relaively but the female distribution is more according to the qq-plots.
+   
+## D. Relationship between Juvenile weight & hind foot length
   
 ```{r}
 
-# 3) c) iv) - Relationship between Juvenile weight & hind foot length (mm)
+# 3) c) iv) Relationship between juvenile weight & hind foot length. Explore the relationship between juvenile snowshoe hare hind foot length (variable `hindft`, recorded in millimeters), and weight. Include all juvenile hares in the study. Create a final visualization of juvenile hare hind foot length versus weight. Include a figure caption.
 
 # hares_juv_wt_hr <- hares_juv  %>%  # start with hares_juv data
 ggplot(data = hares_juv, aes(x = hindft, y = weight, color = sex)) +
   geom_point() +
-  #geom_smooth(method = "lm",color = "red", size = 0.5, fill = "gray10", alpha = 0.5) +
+  geom_smooth(method = "lm",color = "purple", size = 0.7, fill = "gray10", alpha = 0.3) +
   #stat_regline_equation(label.x = 180, label.y = 5700) +
   theme_minimal() +
   labs(x = "Hindfoot Length (mm)", y = "Hare Weight (g)") +
   scale_color_discrete(name = "Sex",                       # formulas say _fill_?
-                      labels = c("Female", "Male", "Undetermined"))     
+                      labels = c("Female", "Male", "Undetermined")) +
+  theme(legend.position = c(0.15, 0.7))
 
 ```
-  
+
+**Figure 3.**  
+
+
 ```{r}
 # Boss asks for linear regression of Weight vs Hindfoot Length
 
@@ -203,4 +236,11 @@ plot(hares_juv_lm)
 
 ```
 
-The linear regression showed that on average the weight of the hare will increase by `r round(hares_juv_lm$coefficient[2], 2)` grams per mm of hindfoot increase.
+The linear regression showed that on average the weight of the hare will increase by `r round(hares_juv_lm$coefficient[2], 2)` grams per mm of hind foot increase.
+
+## Summary
+
+
+
+## Citations
+(Kielland), K., F.S. Chapin, R.W. Ruess, and Bonanza Creek LTER. 2017. Snowshoe hare physical data in Bonanza Creek Experimental Forest: 1999-Present ver 22. Environmental Data Initiative. https://doi.org/10.6073/pasta/03dce4856d79b91557d8e6ce2cbcdc14
