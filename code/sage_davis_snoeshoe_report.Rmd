@@ -27,19 +27,18 @@ hares <- read_csv(here("data", "bonanza_hares.csv"))
 hares
 ```
 
-### 1. Introduction
+## 1. Introduction
 
-This report provides an exploratory overview if differences in juvenile hares for three Bonanza Creek Experimental Forest (Long Term Research Forest) sampling sites (bonbs, bonmat, and bonrip) in Alaska during the interval between 1998 - 2012 (Kielland et al. 2017). These sites were used for live trappings of snowshoe hares to monitor their abundance and survival in the experimental forest.  Specifically the number of juvenile hares trapped each year, the hare weights compared  by sex and sampling location, the compared weights between each sex, and the relationship between weight and hind foot length.
+This report provides an exploratory overview if differences in juvenile hares for three Bonanza Creek Experimental Forest (Long Term Research Forest) sampling sites (Bonanza Black Spruce, Bonanza Mature, Bonanza Riparian) in Alaska during the interval between 1998 - 2012 (Kielland et al. 2017). These sites were used for live trappings of snowshoe hares to monitor their abundance and survival in the experimental forest.  Specifically the number of juvenile hares trapped each year, the hare weights compared  by sex and sampling location, the compared weights between each sex, and the relationship between weight and hind foot length.
 
-### 2. Data & Analysis
+## 2. Data & Analysis
 
 Hare data including sampling site, date caught, sex, age (adult or juvenile), left ear, right ear, hind foot length, and weight was collected and provided by Dr. Knut Kielland and his colleagues at the Bonanza Creek Experimental Forest in Alaska.  The data contained 3197 unique observations of hares, and of those those there were 378 juvenile hare observations, collected over 14 years.  Following exploratory data analysis and visualizations, the juvenile weight comparisons between male and female are compared using a two-sample t-test.  They are further compared using a Cohen's d effect size.  The relationship between the juvenile weight and hind foot length is explored using a linear regression.  All analyses are in R version 4.1.1 using RStudio version 2021.09.0.
 
-(Users\brenguest\Documents\MESM\esm206\Assignments\Assignment 4\sage_davis_snowshoe_report\bonbs.PNG)
 
 ## Prelimary Results
 
-## A. Annual juvenile hare counts
+### A. Annual juvenile hare counts
 
 ```{r echo = FALSE, message = FALSE, warning = FALSE, fig.keep = "last", fig.align = "center"}
 
@@ -85,8 +84,10 @@ ggplot(data = hares_juv_count, aes(x = year, y = juv_count)) +
   geom_line(fill = "yellow", color = "blue") + 
   geom_point(shape = 21, color = "black", fill = "red", size = 3) +
   theme_minimal() +
-  labs(x = "Year", y = "Annual Juvenile Hare Trappings") 
+  labs(x = "Year", y = "Annual Juvenile Hare Trappings") +
+  scale_x_continuous(breaks = scales::breaks_width(2))
   
+
 ```
 
 **Figure 1.**  Annual juvenile hare observations during 1998 - 2012 at Bonanza Creek LTER, Alaska.  Kielland, et al. (2017).  
@@ -94,7 +95,7 @@ ggplot(data = hares_juv_count, aes(x = year, y = juv_count)) +
 The juvenile hare observation (trapped) stats were `r hares_max` max., `r hares_min` min., `r hares_med` median, and `r hares_mean` mean.  The overall observations are trending down for the data set but this could be due to some other factor like trap failure or location.  It appears that the trappings are cycling every two to three years from about 50 to under 10 catches annually.  This could possibly be due to the weather or time of year that there traps are deployed. 
 
 
-## B. Juvenile hare weights for each sex at each sampling sites
+### B. Juvenile hare weights for each sex at each sampling sites
 
 
 ```{r echo = FALSE, message = FALSE, warning = FALSE, fig.keep = "last", fig.align = "center"}
@@ -116,16 +117,16 @@ ggplot(data = hares_juv_sex_case, aes(x = sex, y = weight, color = grid)) +
   labs(x = "Sex", y = "Weight (g)", 
        legend.title = "Sampling Site") +
   scale_color_discrete(name = "Sampling Site",
-                       labels = c("Bonanza BS", "Bonanza Mature", "Bonanza Riparian"))  # rename legend
+                       labels = c("Bonanza Black Spruce", "Bonanza Mature", "Bonanza Riparian"))  # rename legend
 
 ```
 
 **Figure 2.**  Plots of the juvenile hare weights (grams) vs sex for the Female, Male , and Unidentifiable juvenile hares at the three sampling sites during 1998 - 2012 at Bonanza Creek LTER, Alaska.  Kielland, et al. (2017).  
 
-The Bonanza Riparian site appears to have the largest number of trappings while the Bonanza BS appears to have the smallest.  Overall, the range of weights is between 400 to 1500 grams.  Both the sexes appear to be in the same relative weight range at all three sites.
+The Bonanza Riparian site appears to have the largest number of trappings while the Bonanza Black Spruce appears to have the smallest.  Overall, the range of weights is between 400 to 1500 grams.  Both the sexes appear to be in the same relative weight range at all three sites.
 
 
-## C. Female and male juvenile hare weight comparison
+### C. Female and male juvenile hare weight comparison
 
 ```{r echo = FALSE, message = FALSE, warning = FALSE, fig.keep = 'none', results = FALSE}
 
@@ -209,7 +210,7 @@ hares_juv_weights_table <- hares_juv_weights %>%
                       "Mean Weight (g)", 
                       "Standard Deviation (g)",
                       "Sample Size (n)"), 
-        caption = "Female & Male Juvenile Hare Weight Means and Standard Deviations") %>% 
+        caption = "Female & Male Juvenile Hare Weight Means, Standard Deviations & Sampling Size") %>% 
   kable_styling(full_width = FALSE)
 
 hares_juv_weights_table
@@ -218,7 +219,7 @@ hares_juv_weights_table
   
 The distributions of the female and male hares is relatively similar but the female distribution is more normal according to the qq-plot analysis.  The male hares were heaviest of the two (`r hares_juv_weights[2,2]` $\pm$ `r hares_juv_weights[2,3]` g, *n* = `r hares_juv_weights[2,4]`; mean $\pm$  1 standard deviation), compared to female hares (`r hares_juv_weights[1,2]` $\pm$ `r hares_juv_weights[1,3]` g, *n* = `r hares_juv_weights[1,4]`; mean $\pm$  1 standard deviation).  The Cohen's effect size of `r round(weight_cohen$estimate, 2)` is small. The Welch two-sample t-test provided a t value of `r round(hares_juv_wt_sex_t$statistic, 3)`, a p-value of `r round(hares_juv_wt_sex_t$p.value, 3)`, and the difference in the means of 90.5g (or 10.6%).
    
-## D. Relationship between male and female juvenile hare weight & hind foot length was compared.  
+### D. Relationship between juvenile hare weight and hind foot length  
   
 ```{r echo = FALSE, message = FALSE, warning = FALSE, fig.keep = 'all'}
 
@@ -249,6 +250,8 @@ hares_juv_lm <- lm(weight ~ hindft, data = hares_juv)
 
 summary(hares_juv_lm)
 
+hares_juv_lm_glance <- broom::glance(hares_juv_lm)
+
 plot(hares_juv_lm)
 
 # Pearson's test
@@ -259,7 +262,7 @@ pear
 
 ```
 
-The linear regression showed that on average the weight of the hare will increase by `r round(hares_juv_lm$coefficient[2], 2)` grams per mm of hind foot increase.  It showed that the (weight) slope intercept is `r round(hares_juv_lm$coefficient[1], 2)` which seems meaningless since the weight cannot be negative but just reflects that the model is only applicable in meaningful range. The model outputs an adjusted R-squared value is 0.3.
+The linear regression showed that on average the weight of the hare will increase by `r round(hares_juv_lm$coefficient[2], 2)` grams per mm of hind foot increase.  It showed that the (weight) slope intercept is `r round(hares_juv_lm$coefficient[1], 2)` which seems meaningless since the weight cannot be negative but just reflects that the model is only applicable in meaningful range. The model outputs an adjusted R-squared value of `r round(hares_juv_lm_glance$adj.r.squared, 1)`.
 
 ## Summary
 The exploratory data analysis yielded the following initial findings:
@@ -270,7 +273,7 @@ The exploratory data analysis yielded the following initial findings:
 
 Next Steps:
 
-- Compare adult weights to flipper lengths, and perform linear regression.
+- Compare adult weights to hind foot lengths, and perform linear regression.
 - Compare above adult linear regression to juvenile linear regression.
 - Compare linear above at each sampling site.
 
