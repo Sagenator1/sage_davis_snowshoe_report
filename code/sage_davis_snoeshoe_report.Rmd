@@ -217,7 +217,7 @@ hares_juv_weights_table
 
 ```
   
-The distributions of the female and male hares is relatively similar but the female distribution is more normal according to the qq-plot analysis.  The male hares were heaviest of the two (`r hares_juv_weights[2,2]` $\pm$ `r hares_juv_weights[2,3]` g, *n* = `r hares_juv_weights[2,4]`; mean $\pm$  1 standard deviation), compared to female hares (`r hares_juv_weights[1,2]` $\pm$ `r hares_juv_weights[1,3]` g, *n* = `r hares_juv_weights[1,4]`; mean $\pm$  1 standard deviation).  The Cohen's effect size of `r round(weight_cohen$estimate, 2)` is small. The Welch two-sample t-test provided a t value of `r round(hares_juv_wt_sex_t$statistic, 3)`, a p-value of `r round(hares_juv_wt_sex_t$p.value, 3)`, and the difference in the means of 90.5g (or 10.6%).
+The distributions of the female and male hares is relatively similar but the female distribution is more normal according to the qq-plot analysis.  The male hares were heaviest of the two (`r hares_juv_weights[2,2]` $\pm$ `r hares_juv_weights[2,3]` g, *n* = `r hares_juv_weights[2,4]`; mean $\pm$  1 standard deviation), compared to female hares (`r hares_juv_weights[1,2]` $\pm$ `r hares_juv_weights[1,3]` g, *n* = `r hares_juv_weights[1,4]`; mean $\pm$  1 standard deviation).  The Cohen's effect size of `r round(weight_cohen$estimate, 2)` is small. The Welch two-sample t-test provided a t value of `r round(hares_juv_wt_sex_t$statistic, 3)`, a p-value of `r round(hares_juv_wt_sex_t$p.value, 3)`, and the difference in the means of 90.5g (or 10%).
    
 ### D. Relationship between juvenile hare weight and hind foot length  
   
