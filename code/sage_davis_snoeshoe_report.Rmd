@@ -275,7 +275,7 @@ Next Steps:
 
 - Compare adult weights to hind foot lengths, and perform linear regression.
 - Compare above adult linear regression to juvenile linear regression.
-- Compare linear above at each sampling site.
+- Compare linear regression above at each sampling site.
 
 
 
