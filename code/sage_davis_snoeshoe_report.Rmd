@@ -40,11 +40,8 @@ Hare data including sampling site, date caught, sex, age (adult or juvenile), le
 
 ### A. Annual juvenile hare counts
 
-<<<<<<< HEAD
-```{r include = FALSE, message = FALSE, warning = FALSE}
-=======
 ```{r echo = FALSE, message = FALSE, warning = FALSE, fig.keep = "last", fig.align = "center"}
->>>>>>> 3de7f5c69607f4c0f4ea80a1184993f348b4eca3
+
 
 # 3) c) i) i)	Annual juvenile hare trap counts. Count the total number of juvenile hare trappings during each year of the study, and create a finalized data visualization of the counts by year. Include a figure caption below the figure in your report. 
 
@@ -88,15 +85,8 @@ ggplot(data = hares_juv_count, aes(x = year, y = juv_count)) +
   geom_line(fill = "yellow", color = "blue") + 
   geom_point(shape = 21, color = "black", fill = "red", size = 3) +
   theme_minimal() +
-<<<<<<< HEAD
-  labs(x = "Year", y = "Annual Juvenile Hare Trappings") 
-
-
-=======
   labs(x = "Year", y = "Annual Juvenile Hare Trappings") +
   scale_x_continuous(breaks = scales::breaks_width(2))
->>>>>>> 3de7f5c69607f4c0f4ea80a1184993f348b4eca3
-  
 
 ```
 
